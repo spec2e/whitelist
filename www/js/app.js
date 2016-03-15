@@ -27,6 +27,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
 
+  cordova.plugins.backgroundMode.enable();
+
   $httpProvider.defaults.useXDomain = true;
   delete $httpProvider.defaults.headers.common['X-Requested-With'];
 

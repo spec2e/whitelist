@@ -1,25 +1,35 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, $http) {
+.controller('DashCtrl', function($scope, $http, $interval) {
 
-  usageStats.usage("World", function(data) {
-    console.log('data is :' + JSON.stringify(data));
-    $scope.usage = JSON.stringify(data);
+  cordova.plugins.backgroundMode.onactivate = function () {
+    $interval(function () {
+      sendData();
+    }, 5000);
+  };
 
-    var host = 'http://192.168.0.10:8000';
+  sendData();
 
-    $http.post(host + '/register/spe', $scope.usage)
-      .then(function success() {
-        console.log('data was sent');
-      }, function err(err) {
-        console.log('something went wrong! ' + JSON.stringify(err));
-      });
+  function sendData() {
+    usageStats.usage("World", function(data) {
+      console.log('data is :' + JSON.stringify(data));
+      $scope.usage = JSON.stringify(data);
 
+      var host = 'http://192.168.0.10:8000';
 
+      $http.post(host + '/register/test', $scope.usage)
+        .then(function success() {
+          console.log('data was sent');
+        }, function err(err) {
+          console.log('something went wrong! ' + JSON.stringify(err));
+        });
 
-  }, function(err) {
-    console.log('error from usage plugin: ' + err );
-  });
+    }, function(err) {
+      console.log('error from usage plugin: ' + err );
+    });
+
+  }
+
 
   navigator.appInfo.getAppInfo(function(appInfo) {
     $scope.appInfo = appInfo;
