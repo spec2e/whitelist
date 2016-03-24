@@ -1,50 +1,38 @@
 angular.module('starter.services', [])
 
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
+  .factory('UsageStats', function ($http, $resource, $q) {
 
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
+    var host = 'http://192.168.0.10:8000';
+    var statsResource = $resource(host + '/spe');
 
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
+    return {
+      getData: getData,
+      sendData: sendData
+    };
+
+    function getData() {
+      return statsResource.query().$promise;
     }
-  };
-});
+
+    function sendData() {
+
+      var deferred = $q.defer();
+
+      usageStats.usage("World", function (data) {
+        console.log( JSON.stringify(data));
+        $http.post(host + '/register/spe', $scope.usage)
+          .then(function success() {
+            console.log('data was sent');
+            deferred.resolve();
+          })
+          .catch(function err(err) {
+            console.log('something went wrong! ' + JSON.stringify(err));
+            deferred.reject(err);
+          });
+      }, function (err) {
+        console.log('error from usage plugin: ' + err);
+      });
+
+      return deferred.promise;
+    }
+  });

@@ -1,72 +1,82 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope, $http, $interval) {
+  .controller('DashCtrl', function ($scope, UsageStats, $interval) {
 
-  cordova.plugins.backgroundMode.onactivate = function () {
-    $interval(function () {
-      sendData();
-    }, 5000);
-  };
+    var dash = this;
+    dash.usageAvailable = true;
+    dash.appInfo = undefined;
+    dash.sendData = sendData;
 
-  sendData();
+    if (
+      window.cordova &&
+      window.cordova.plugins &&
+      window.cordova.plugins.backgroundMode) {
 
-  function sendData() {
-    usageStats.usage("World", function(data) {
-      console.log('data is :' + JSON.stringify(data));
-      $scope.usage = JSON.stringify(data);
+      dash.usageAvailable = true;
 
-      var host = 'http://192.168.0.10:8000';
+      /*
+      cordova.plugins.backgroundMode.onactivate = function () {
+        $interval(function () {
+          UsageStats.sendData();
+        }, 5000);
+      };
+      */
+    } else {
+      console.log('DashCtrl: cordova plugin backgroundMode not available ...');
+    }
 
-      $http.post(host + '/register/test', $scope.usage)
-        .then(function success() {
-          console.log('data was sent');
-        }, function err(err) {
-          console.log('something went wrong! ' + JSON.stringify(err));
+    if (
+      window.navigator &&
+      window.navigator.appInfo) {
+
+      navigator.appInfo.getAppInfo(function (appInfo) {
+        dash.appInfo = appInfo;
+        console.log('identifier: %s', appInfo.identifier);
+        console.log('version: %s', appInfo.version);
+        console.log('build: %s', appInfo.build);
+      }, function (err) {
+        alert(err);
+      });
+    } else {
+      console.log('DashCtrl: cordova plugin appInfo not available ...');
+    }
+
+    function sendData () {
+      UsageStats.sendData();
+    }
+
+  })
+
+  .controller('StatsCtrl', function ($scope, UsageStats) {
+    // With the new view caching in Ionic, Controllers are only called
+    // when they are recreated or on app start, instead of every page change.
+    // To listen for when this page is active (for example, to refresh data),
+    // listen for the $ionicView.enter event:
+    //
+    //$scope.$on('$ionicView.enter', function(e) {
+    //});
+
+    var stats = this;
+    stats.statistics = undefined;
+
+    activate();
+
+    function activate() {
+
+      console.log('in stats ctrl');
+
+      UsageStats.getData()
+        .then(function (data) {
+          stats.statistics = data;
+        })
+        .catch(function(err) {
+          console.log('Error!!!: ' + err);
         });
+    }
+  })
 
-    }, function(err) {
-      console.log('error from usage plugin: ' + err );
-    });
-
-  }
-
-
-  navigator.appInfo.getAppInfo(function(appInfo) {
-    $scope.appInfo = appInfo;
-    console.log('identifier: %s', appInfo.identifier);
-    console.log('version: %s', appInfo.version);
-    console.log('build: %s', appInfo.build);
-
-
-  }, function(err) {
-    alert(err);
+  .controller('AccountCtrl', function ($scope) {
+    $scope.settings = {
+      enableFriends: true
+    };
   });
-
-
-
-})
-
-.controller('ChatsCtrl', function($scope, Chats) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  };
-})
-
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
-})
-
-.controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
-});
