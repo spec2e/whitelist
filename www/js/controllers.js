@@ -35,22 +35,27 @@ angular.module('starter.controllers', [])
     }
 
     function registerUsagePlugin() {
-      if (
-        window.cordova &&
-        window.cordova.plugins &&
-        window.cordova.plugins.backgroundMode) {
+      try {
 
-        dash.usageAvailable = true;
 
-        /*
-         cordova.plugins.backgroundMode.onactivate = function () {
-         $interval(function () {
-         UsageStats.sendData();
-         }, 5000);
-         };
-         */
-      } else {
-        console.log('DashCtrl: cordova plugin backgroundMode not available ...');
+        if (
+          window.usageStats) {
+
+          dash.usageAvailable = true;
+
+          /*
+           cordova.plugins.backgroundMode.onactivate = function () {
+           $interval(function () {
+           UsageStats.sendData();
+           }, 5000);
+           };
+           */
+        } else {
+          dash.error = 'DashCtrl: cordova plugin usageStats not available ... cordova is: ' + window.cordova;
+          console.log('DashCtrl: cordova plugin usageStats not available ...');
+        }
+      } catch(err) {
+        dash.error = 'DashCtrl: error: ' + err;
       }
     }
 

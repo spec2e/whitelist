@@ -5,6 +5,7 @@
     <button class="button button-positive" ng-if="dash.usageAvailable" ng-click="dash.sendData()">
       Send usage data
     </button>
+    {{ dash.error }}
     <br><br>
     <ion-list>
       <ion-item ng-repeat="stat in dash.statistics">
