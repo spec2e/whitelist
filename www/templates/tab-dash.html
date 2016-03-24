@@ -1,21 +1,16 @@
 <ion-view view-title="Whitelist">
   <ion-content class="padding">
     <h2>App usage last 24 hours:</h2>
-    <h2 ng-if="dash.appInfo">appInfo.identifier: {{ dash.appInfo.identifier }}</h2>
-
     <br>
     <button class="button button-positive" ng-if="dash.usageAvailable" ng-click="dash.sendData()">
       Send usage data
     </button>
     <br><br>
-
-    <div ng-controller="StatsCtrl as stats">
-      <ion-list>
-        <ion-item ng-repeat="stat in stats.statistics">
-          <h2>{{stat.app}}</h2>
-          <p>Usage: {{stat.minutes}} minutes</p>
-        </ion-item>
-      </ion-list>
-    </div>
+    <ion-list>
+      <ion-item ng-repeat="stat in dash.statistics">
+        <h2>{{stat.app}}</h2>
+        <p>Usage: {{stat.minutes}} minutes</p>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

@@ -3,46 +3,55 @@ angular.module('starter.controllers', [])
   .controller('DashCtrl', function ($scope, UsageStats, $interval) {
 
     var dash = this;
-    dash.usageAvailable = true;
+    dash.usageAvailable = false;
     dash.appInfo = undefined;
     dash.sendData = sendData;
+    dash.getData = getData;
+    dash.statistics = undefined;
 
-    if (
-      window.cordova &&
-      window.cordova.plugins &&
-      window.cordova.plugins.backgroundMode) {
+    activate();
 
-      dash.usageAvailable = true;
+    return dash;
 
-      /*
-      cordova.plugins.backgroundMode.onactivate = function () {
-        $interval(function () {
-          UsageStats.sendData();
-        }, 5000);
-      };
-      */
-    } else {
-      console.log('DashCtrl: cordova plugin backgroundMode not available ...');
+    function activate() {
+      registerUsagePlugin();
     }
 
-    if (
-      window.navigator &&
-      window.navigator.appInfo) {
-
-      navigator.appInfo.getAppInfo(function (appInfo) {
-        dash.appInfo = appInfo;
-        console.log('identifier: %s', appInfo.identifier);
-        console.log('version: %s', appInfo.version);
-        console.log('build: %s', appInfo.build);
-      }, function (err) {
-        alert(err);
-      });
-    } else {
-      console.log('DashCtrl: cordova plugin appInfo not available ...');
+    function sendData() {
+      UsageStats.sendData()
+        .then(function () {
+          getData();
+        })
     }
 
-    function sendData () {
-      UsageStats.sendData();
+    function getData() {
+      UsageStats.getData()
+        .then(function (data) {
+          dash.statistics = data;
+        })
+        .catch(function (err) {
+          console.log('Error!!!: ' + err);
+        });
+    }
+
+    function registerUsagePlugin() {
+      if (
+        window.cordova &&
+        window.cordova.plugins &&
+        window.cordova.plugins.backgroundMode) {
+
+        dash.usageAvailable = true;
+
+        /*
+         cordova.plugins.backgroundMode.onactivate = function () {
+         $interval(function () {
+         UsageStats.sendData();
+         }, 5000);
+         };
+         */
+      } else {
+        console.log('DashCtrl: cordova plugin backgroundMode not available ...');
+      }
     }
 
   })
@@ -56,23 +65,6 @@ angular.module('starter.controllers', [])
     //$scope.$on('$ionicView.enter', function(e) {
     //});
 
-    var stats = this;
-    stats.statistics = undefined;
-
-    activate();
-
-    function activate() {
-
-      console.log('in stats ctrl');
-
-      UsageStats.getData()
-        .then(function (data) {
-          stats.statistics = data;
-        })
-        .catch(function(err) {
-          console.log('Error!!!: ' + err);
-        });
-    }
   })
 
   .controller('AccountCtrl', function ($scope) {

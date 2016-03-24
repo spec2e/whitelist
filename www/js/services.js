@@ -20,7 +20,7 @@ angular.module('starter.services', [])
 
       usageStats.usage("World", function (data) {
         console.log( JSON.stringify(data));
-        $http.post(host + '/register/spe', $scope.usage)
+        $http.post(host + '/register/spe', data)
           .then(function success() {
             console.log('data was sent');
             deferred.resolve();
