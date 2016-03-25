@@ -51,7 +51,7 @@ angular.module('starter.controllers', [])
            };
            */
         } else {
-          dash.error = 'DashCtrl: cordova plugin usageStats not available ... cordova is: ' + window.cordova;
+          dash.error = 'DashCtrl: cordova plugin usageStats not available ... cordova is: ' + window.usageStats;
           console.log('DashCtrl: cordova plugin usageStats not available ...');
         }
       } catch(err) {
